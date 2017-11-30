@@ -36,7 +36,7 @@ then
 
 else
 	echo "" 
-        echo "# Usage : ./conn.sh innoworks.ec2" 
+        echo "# Usage : ./conn.sh test.ec2" 
         echo "# I need a file with server information"
 	echo ""
 fi
