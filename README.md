@@ -12,25 +12,49 @@ git clone https://github.com/Seungwoo321/shellScript.git
 cd shellScript/loginManager 
 ./init.sh 
 cd ~/script/
+chmod 755 *.sh
 ```
 
-### Start Script Example
+### Command 
+
+* userScript.sh 
+```
+./userScript.sh add
+./userScript.sh info
+./userScript.sh byserver
+./userScript.sh register
+./userScript.sh deregister
+./userScript.sh delete
+
+```
+* serverScript.sh
+```
+./serverScript.sh add
+./serverScript.sh info
+./serverScript.sh update
+./serverScript.sh delete
+```
 
 
-* server set 
+### Usage Example
+
+
+* Server setting 
 ```
 ./serverScript.sh add
 
 ```
 
-* user set 
+* User setting 
 ```
 ./userScript.sh add 
 
 ```
 
-* user register on server 
+* Update user information that can access the server.
 ```
 ./userScript.sh register 
 
 ```
+
+
