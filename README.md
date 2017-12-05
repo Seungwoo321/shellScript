@@ -2,6 +2,11 @@
 
 
 ## ec2conn 
+* test
+```
+./conn.sh test.ec2 
+
+```
 
 
 ## loginManager 
