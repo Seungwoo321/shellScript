@@ -5,7 +5,6 @@
 * test
 ```
 ./conn.sh test.ec2 
-
 ```
 
 
@@ -30,7 +29,6 @@ chmod 755 *.sh
 ./userScript.sh register
 ./userScript.sh deregister
 ./userScript.sh delete
-
 ```
 * serverScript.sh
 ```
@@ -47,19 +45,16 @@ chmod 755 *.sh
 * Server setting 
 ```
 ./serverScript.sh add
-
 ```
 
 * User setting 
 ```
 ./userScript.sh add 
-
 ```
 
 * Update user information that can access the server.
 ```
 ./userScript.sh register 
-
 ```
 
 
