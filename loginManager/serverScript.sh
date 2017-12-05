@@ -7,6 +7,7 @@ execution_date=`date`
 dir_tmp=../data/tmp
 dir_servers=../data/servers
 dir_users=../data/users
+dir_logs=../data/logs
 aws_az=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
 aws_region=${az::-1}
 
@@ -18,7 +19,7 @@ checkExitStatus(){
     fi
 }
 appendLogs(){
-	echo "$execution_date	$1	$2	$3	$4" >> ../data/logs/loginManager
+	echo "$execution_date	$1	$2	$3	$4" >> $dir_logs/loginManager
 }
 checkrDuplicateByserver(){
 	existFields=`cat $dir_servers/$1/$4 | cut -d '	' -f$2`
