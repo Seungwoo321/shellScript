@@ -7,6 +7,7 @@ execution_date=`date`
 dir_tmp=../data/tmp
 dir_servers=../data/servers
 dir_users=../data/users
+dir_logs=../data/logs
 aws_az=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
 aws_region=${aws_az::-1}
 
@@ -18,7 +19,7 @@ checkExitStatus(){
     fi
 }
 appendLogs(){
-	echo "$execution_date	$1	$2	$3	$4" >> ../data/logs/loginManager
+	echo "$execution_date	$1	$2	$3	$4" >> $dir_logs/loginManager
 }
 checkrDuplicateByserver(){
 	existFields=`cat $dir_servers/$1/$4 | cut -d '	' -f$2`
@@ -103,6 +104,9 @@ createLoginUser(){
 	sudo -u $1 chmod 600 /home/$1/.ssh/authorized_keys
 	sudo -u $1 mkdir /home/$1/.key
 	sudo -u $1 chmod 700 /home/$1/.key
+	sudo -u $1 touch /home/$1/$1.list
+	sudo cp conn.sh /home/$1/
+	sudo chown $1.$1 /home/$1/conn.sh
 
 }
 
@@ -230,6 +234,10 @@ userRegister(){
 		oldPubkey=`ssh-keygen -y -f ~/.key/$oldKeypair.pem`
 		echo $oldPubkey $oldKeypair >> $dir_tmp/$strServer.authorized_keys
 
+		# variable
+		ipaddress=`cat $dir_servers/$strServer/server.info | cut -d '	' -f2`
+		region=`cat $dir_servers/$strServer/server.info | cut -d '	' -f3`
+
 		for selectedUserItem in ${selectedUserArray[@]};do
 			strUser=`sed -e 's/^"//' -e 's/"$//' <<<"$selectedUserItem"`
 
@@ -240,27 +248,34 @@ userRegister(){
 					# user info update by host
 					echo "$name	$email" >> $dir_servers/$strServer/user.info
 
+					# user server list update
+					sudo cat /home/$loginUser/$loginUser.list | grep $strServer
+					exitStatus=$?
+					if [ $exitStatus -eq 1 ]; then
+						sudo mv /home/$loginUser/$loginUser.list $dir_tmp/$loginUser.list
+						echo "$strServer	ec2-user	$ipaddress	$email.pem	$region" >> $dir_tmp/$loginUser.list
+						sudo mv $dir_tmp/$loginUser.list /home/$loginUser/$loginUser.list
+						sudo chown $loginUser.$loginUser /home/$loginUser/$loginUser.list
+					fi
+
 					# authorized_keys update
 					newKeypair=$email
 					newPubkey=`sudo ssh-keygen -y -f /home/$loginUser/.key/$newKeypair.pem`
 					echo $newPubkey $newKeypair >> $dir_tmp/$strServer.authorized_keys
-
 				fi
 			done < $dir_users/list
 		done
 
 		# new authorized_keys to remote server
-		ipaddress=`cat $dir_servers/$strServer/server.info | cut -d '	' -f2`
+		echo "Connect to $ipaddress ..."
 		scp -i ~/.key/$oldKeypair.pem $dir_tmp/$strServer.authorized_keys ec2-user@$ipaddress:.ssh/authorized_keys
 		rm $dir_tmp/$strServer.authorized_keys
 		appendLogs "registerUser $strServer	$strUser"
+		echo "Success: Updated new authorized_keys "
 
 	done
 }
 
-userInfo(){
-	cat $dir_users/list
-}
 userDeregister(){
 
 	# select server
@@ -289,9 +304,9 @@ userDeregister(){
 	ipaddress=`cat $dir_servers/$selectedServerItem/server.info | cut -d '	' -f2`
 	scp -i ~/.key/$oldKeypair.pem ec2-user@$ipaddress:.ssh/authorized_keys $dir_tmp/$selectedServerItem.authorized_keys
 
-
 	## delete user & key info
 	for selectedUserItem in ${selectedUserArray[@]};do
+		### variable for delete
 	  strUser=`sed -e 's/^"//' -e 's/"$//' <<<"$selectedUserItem"`
 
 		### delete user from user.info by host
@@ -299,19 +314,31 @@ userDeregister(){
 
 		### delete pubkey from remote server's authorized_keys
 		newkeypair=`cat $dir_users/list | grep $strUser | awk '{print $2}'`
-		echo $newkeypair
 		sed -i /$newkeypair/d $dir_tmp/$selectedServerItem.authorized_keys
+
+		# user server list update
+		loginUser=`cat $dir_users/list | grep $strUser | awk '{print $3}'`
+		sudo sed -i /$selectedServerItem/d /home/$loginUser/$loginUser.list
+
 	done
 
 	## upload new.authorized_keys to remote server
 	scp -i ~/.key/$oldKeypair.pem $dir_tmp/$selectedServerItem.authorized_keys ec2-user@$ipaddress:.ssh/authorized_keys
-	#rm $dir_tmp/$selectedServerItem.authorized_keys
+	rm $dir_tmp/$selectedServerItem.authorized_keys
 }
 
-userInfoByHost(){
-	cat $dir_servers/$1/server.info
-
+userInfo(){
+	cat $dir_users/list
 }
+userInfoByServer(){
+	serverArray=`ls $dir_servers`
+	for server in ${serverArray[@]}; do
+		echo "==================================="
+		echo Server Name : $server
+		echo Access Users: `cat $dir_servers/$server/user.info | awk '{print $1}'`
+	done
+}
+
 
 case "$1" in
 	add)
@@ -320,8 +347,8 @@ case "$1" in
 	info)
 		userInfo
 		;;
-	infoby)
-		userInfoByHost $2
+	byserver)
+		userInfoByServer
 		;;
 	register)
 		userRegister
@@ -333,7 +360,7 @@ case "$1" in
 		userDelete
 		;;
 	*)
-		echo $"Usage: $0 {add|info|register|deregister|delete}"
+		echo $"Usage: $0 {add|info|byserver|register|deregister|delete}"
 		exit 1
 		;;
 esac
