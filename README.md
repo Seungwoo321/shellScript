@@ -10,7 +10,14 @@
 
 ## loginManager 
 
-### Set 
+
+### Note
+* Tested in Amazon Linux environment.
+* This script has been set up to set the bastion environment.
+* The remote server only connects to ec2-user
+
+
+### Setup
 ```
 git clone https://github.com/Seungwoo321/shellScript.git
 cd shellScript/loginManager 
