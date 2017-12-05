@@ -49,17 +49,17 @@ chmod 755 *.sh
 ### Usage Example
 
 
-* Server setting 
+* Add server information to manage access.
 ```
 ./serverScript.sh add
 ```
 
-* User setting 
+* Create a user who can connect to the Bastion server(=local environment)
 ```
 ./userScript.sh add 
 ```
 
-* Update user information that can access the server.
+* Update user information that can access the server in login user's home directory.
 ```
 ./userScript.sh register 
 ```
