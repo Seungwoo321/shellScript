@@ -125,7 +125,7 @@ userAdd(){
 	checkDuplicate 1 $inputUserName
 
 	# input box user email
-	inputUserEmail=$(whiptail --inputbox "Input User Email?" 8 40 "hong@mz.co.kr" --title "User Email" 3>&1 1>&2 2>&3)
+	inputUserEmail=$(whiptail --inputbox "Input User Email?" 8 40 "hong@email.com" --title "User Email" 3>&1 1>&2 2>&3)
 	exitStatus=$?
 	checkExitStatus $exitStatus
 	checkDuplicate 2 $inputUserEmail

@@ -1,10 +1,9 @@
 #/bin/sh
 
-# session variable
-echo `SCRIPT=$HOME/script`
-echo `DATA=$HOME/data`
+# variable
+SCRIPT=$HOME/script
 
-# set data  
+# set dirctory  
 mkdir -p $HOME/data/
 mkdir -p $HOME/data/servers/
 mkdir -p $HOME/data/users/
@@ -13,8 +12,8 @@ touch $HOME/data/users/list
 
 # set script 
 mkdir -p $HOME/script/
-mv serverScript.sh $SCRIPT/
-mv userScript.sh $SCRIPT/
+cp ./serverScript.sh $SCRIPT/
+cp ./userScript.sh $SCRIPT/
 
 # set logs
 mkdir -p $HOME/logs/ 
