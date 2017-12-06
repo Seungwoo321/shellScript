@@ -250,9 +250,9 @@ userRegister(){
 
 					# user server list update
 					sudo cat /home/$loginUser/$loginUser.list | grep $strServer
-					exitStatus=$?
-					if [ $exitStatus -eq 1 ]; then
+					if [ $? -eq 1 ]; then
 						sudo mv /home/$loginUser/$loginUser.list $dir_tmp/$loginUser.list
+						sudo chown ec2-user.ec2-user $dir_tmp/$loginUser.list
 						echo "$strServer	ec2-user	$ipaddress	$email.pem	$region" >> $dir_tmp/$loginUser.list
 						sudo mv $dir_tmp/$loginUser.list /home/$loginUser/$loginUser.list
 						sudo chown $loginUser.$loginUser /home/$loginUser/$loginUser.list
