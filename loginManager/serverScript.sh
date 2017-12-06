@@ -114,7 +114,7 @@ serverUpdate(){
 	changedServer=$(whiptail --inputbox "Change Host name?" 8 40 "$selectServer" --title "New Host Name" 3>&1 1>&2 2>&3)
 	exitStatus=$?
 	checkExitStatus $exitStatus
-	checkrDuplicateByserver $selectServer 1 $changedServer server.info
+	#checkrDuplicateByserver $selectServer 1 $changedServer server.info
 
 	# input box ip address for re-add
 	selectIpaddress=`cat $dir_servers/$selectServer/server.info | awk '{print $2}'`
@@ -143,6 +143,18 @@ serverUpdate(){
 		mv $dir_servers/$selectServer $dir_servers/$changedServer
 	fi
 	echo "$changedServer	$changedIpaddress	$changedRegion	$changedKeypair"  >> $dir_servers/$changedServer/server.info
+	# if user has server info, update.
+	loginUserArray=`sudo ls /home/`
+	for loginUser in ${loginUserArray[@]}; do
+		if [ $loginUser != "ec2-user" ]; then
+			sudo cat /home/$loginUser/$loginUser.list | grep $selectServer
+			if [ $? -eq 0 ]; then
+				email=`cat $dir_users/list | grep $loginUser | awk '{print $2}'`
+				sudo sed -i "s/$selectServer	ec2-user	$selectIpaddress	$email.pem	$selectRegion/$changedServer	ec2-user	$changedIpaddress	$email.pem	$changedRegion/g" /home/$loginUser/$loginUser.list
+			fi
+		fi
+	done
+
 }
 
 
