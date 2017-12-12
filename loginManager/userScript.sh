@@ -319,7 +319,7 @@ userDeregister(){
 		# user server list update
 		loginUser=`cat $dir_users/list | grep $strUser | awk '{print $3}'`
 		sudo sed -i /$selectedServerItem/d /home/$loginUser/$loginUser.list
-
+		appendLogs "deregisterUser $selectedServerItem     $strUser"
 	done
 
 	## upload new.authorized_keys to remote server
