@@ -54,6 +54,28 @@ chmod 755 *.sh
 ./serverScript.sh add
 ```
 
+** required IAM Policy
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateKeyPair",
+                "ec2:DescribeKeyPairs",
+                "ec2:DeleteKeyPair"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+``` 
+
+
+
+
 * Create a user who can connect to the Bastion server(=local environment)
 ```
 ./userScript.sh add 
